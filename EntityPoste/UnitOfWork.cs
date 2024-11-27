@@ -133,7 +133,7 @@ public class UnitOfWork(IUserRepository userRepository) : IDisposable
         var users = userRepository.GetUsersByProvider(providersMat[providerIndex]);
 
         var materialized = users as User[] ?? users.ToArray();
-        if (materialized.Length != 0)
+        if (materialized.Length == 0)
         {
             WriteLine("No users found");
             return;
