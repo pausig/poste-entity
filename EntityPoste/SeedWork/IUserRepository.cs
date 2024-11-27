@@ -8,8 +8,8 @@ public interface IUserRepository : IDisposable
     public void Update(int id, string email);
     public void Delete(int id);
     public IEnumerable<User> GetUsers();
-    
-    public IEnumerable<User> GetUsersByEmail(string email);
 
-    public IEnumerable<String> GetProviders();
+    public IEnumerable<User> GetUsersByProvider(string provider);
+
+    public IEnumerable<string> GetProviders();
 }

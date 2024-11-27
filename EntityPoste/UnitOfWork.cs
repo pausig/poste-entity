@@ -1,3 +1,4 @@
+using EntityPoste.Domain;
 using EntityPoste.SeedWork;
 using Microsoft.Data.SqlClient;
 using static System.Console;
@@ -6,6 +7,11 @@ namespace EntityPoste;
 
 public class UnitOfWork(IUserRepository userRepository) : IDisposable
 {
+    public void Dispose()
+    {
+        userRepository.Dispose();
+    }
+
     public void Work()
     {
         try
@@ -62,10 +68,7 @@ public class UnitOfWork(IUserRepository userRepository) : IDisposable
 
     private void Read()
     {
-        foreach (var user in userRepository.GetUsers())
-        {
-            WriteLine(user.ToString());
-        }
+        foreach (var user in userRepository.GetUsers()) WriteLine(user.ToString());
     }
 
     private void Insert()
@@ -78,27 +81,22 @@ public class UnitOfWork(IUserRepository userRepository) : IDisposable
         if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(email))
         {
             WriteLine("Please enter a valid user name or email");
-            return; 
+            return;
         }
-        
-        userRepository.Insert(userName,email);
-        
+
+        userRepository.Insert(userName, email);
     }
 
     private void Update()
     {
         Write("Insert the Id to Update: ");
         var id = ReadLine();
-        
+
         Write("Insert the Email to Update: ");
         var email = ReadLine();
 
 
-        if (int.TryParse(id, out var userId) && !string.IsNullOrEmpty(email))
-        {
-            userRepository.Update(userId, email);
-        }
-        
+        if (int.TryParse(id, out var userId) && !string.IsNullOrEmpty(email)) userRepository.Update(userId, email);
     }
 
     private void Delete()
@@ -107,13 +105,9 @@ public class UnitOfWork(IUserRepository userRepository) : IDisposable
         var id = ReadLine();
 
         if (int.TryParse(id, out var userId))
-        {
             userRepository.Delete(userId);
-        }
         else
-        {
-            Console.WriteLine("Id is not valid");
-        }
+            WriteLine("Id is not valid");
     }
 
 
@@ -121,38 +115,30 @@ public class UnitOfWork(IUserRepository userRepository) : IDisposable
     {
         WriteLine("Select Provider: ");
 
-        var providers = userRepository.GetProviders().ToList();
+        var providers = userRepository.GetProviders();
 
-        if (providers.Count == 0)
+        var providersMat = providers.ToList();
+        if (providersMat.Count == 0)
         {
             WriteLine("No Providers Found");
             return;
         }
-        for(var i = 0; i < providers.Count; i++)
-        {
-            WriteLine($"{i} - provider: {providers[i]}");
-        }
-        
+
+        for (var i = 0; i < providersMat.Count; i++) WriteLine($"{i} - provider: {providersMat[i]}");
+
         Write("Select Provider: ");
-        var selectedProvider = Console.ReadLine();
-        
+        var selectedProvider = ReadLine();
+
         if (!int.TryParse(selectedProvider, out var providerIndex)) return;
-        var users=  userRepository.GetUsersByEmail(providers[providerIndex]).ToList();
-            
-        if (users.Count == 0)
+        var users = userRepository.GetUsersByProvider(providersMat[providerIndex]);
+
+        var materialized = users as User[] ?? users.ToArray();
+        if (materialized.Length != 0)
         {
             WriteLine("No users found");
             return;
-            
         }
-        foreach (var user in users)
-        {
-            WriteLine(user.ToString());
-        }
-    }
 
-    public void Dispose()
-    {
-        userRepository.Dispose();
+        foreach (var user in materialized) WriteLine(user.ToString());
     }
 }

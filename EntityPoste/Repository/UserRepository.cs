@@ -5,9 +5,14 @@ namespace EntityPoste.Repository;
 
 public class UserRepository(AppDbContext ctx) : IUserRepository, IAsyncDisposable, IDisposable
 {
+    public async ValueTask DisposeAsync()
+    {
+        await ctx.DisposeAsync();
+    }
+
     public void Insert(string name, string email)
     {
-        ctx.Users.Add(new User
+        ctx.Users.Add(new()
         {
             Name = name,
             Email = email
@@ -31,28 +36,11 @@ public class UserRepository(AppDbContext ctx) : IUserRepository, IAsyncDisposabl
         ctx.SaveChanges();
     }
 
-    public IEnumerable<User> GetUsers()
-    {
-        return ctx.Users.ToList();
-    }
+    public IEnumerable<User> GetUsers() => ctx.Users.ToList();
 
-    public IEnumerable<User> GetUsersByEmail(string email)
-    {
-        return ctx.Users.Where(u => u.Email.Contains(email)).ToList();
-    }
+    public IEnumerable<User> GetUsersByProvider(string provider) => ctx.Users.Where(u => u.Email.Contains(provider));
 
-    public IEnumerable<string> GetProviders()
-    {
-       return ctx.Users.Select(u => u.Email.Substring(u.Email.IndexOf("@")+1)).Distinct();
-    }
+    public IEnumerable<string> GetProviders() => ctx.Users.Select(u => u.Email.Substring(u.Email.IndexOf("@") + 1)).Distinct();
 
-    public void Dispose()
-    {
-        ctx.Dispose();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await ctx.DisposeAsync();
-    }
+    public void Dispose() => ctx.Dispose();
 }
