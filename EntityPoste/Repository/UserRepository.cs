@@ -13,11 +13,7 @@ public class UserRepository(AppDbContext ctx) : IUserRepository, IAsyncDisposabl
 
     public void Insert(string name, string email)
     {
-        ctx.Users.Add(new()
-        {
-            Name = name,
-            Email = email
-        });
+        ctx.Users.Add(new User(name, email));
         ctx.SaveChanges();
     }
 
@@ -25,7 +21,7 @@ public class UserRepository(AppDbContext ctx) : IUserRepository, IAsyncDisposabl
     {
         var user = ctx.Users.Find(id);
         if (user == null) return;
-        user.Email = email;
+        user.UpdateEmail(email);
         ctx.SaveChanges();
     }
 

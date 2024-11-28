@@ -1,21 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EntityPoste.Domain
+﻿namespace EntityPoste.Domain
 {
-    public class Address
+    public record Address(int Id, string Street, string City, string Country, int UserId)
     {
-        public int Id { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-
-        public int UserId { get; set; }
-        public User User { get; set; }
-
-        public override string ToString() => $"{Street}, {City}, {Country}";
+        public User? User { get; private set; }
     }
 }
