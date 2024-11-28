@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     });
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Address> Addresses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -20,5 +21,15 @@ public class AppDbContext : DbContext
         optionsBuilder.UseSqlServer(connectionString)
             .EnableSensitiveDataLogging()
             .UseLoggerFactory(MyFactory);
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Addresses)
+            .WithOne(a => a.User)
+            .HasForeignKey(a => a.UserId);
+
+        base.OnModelCreating(modelBuilder);
     }
 }

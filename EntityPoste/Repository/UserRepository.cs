@@ -1,5 +1,6 @@
 using EntityPoste.Domain;
 using EntityPoste.SeedWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntityPoste.Repository;
 
@@ -38,7 +39,7 @@ public class UserRepository(AppDbContext ctx) : IUserRepository, IAsyncDisposabl
 
     public IEnumerable<User> GetUsers() => ctx.Users.ToList();
 
-    public IEnumerable<User> GetUsersByProvider(string provider) => ctx.Users.Where(u => u.Email.Contains(provider));
+    public IEnumerable<User> GetUsersByProvider(string provider) => ctx.Users.Where(u => u.Email.Contains(provider)).Include(u => u.Addresses);
 
     public IEnumerable<string> GetProviders() => ctx.Users.Select(u => u.Email.Substring(u.Email.IndexOf("@") + 1)).Distinct();
 
